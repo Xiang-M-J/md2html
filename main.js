@@ -1,5 +1,6 @@
 const http = require('http');//创建服务器的
 const fs = require('fs');
+const join = require('path').join;
 //引入进来的是模块，模块中有方法，下一步就是使用方法
 //Node.js一个最主要的特点：执行的基本都是函数
 
@@ -28,8 +29,6 @@ myServer.listen('8000',function(err){
     console.log("server is running at http://127.0.0.1:8000");
 })
 
-const join = require('path').join;
-
 function getMdFiles(mdPath){
     let mdFiles = [];
     function findMdFile(path){
@@ -51,5 +50,3 @@ function getMdFiles(mdPath){
     findMdFile(mdPath)
     return mdFiles
 }
-
-let l = getMdFiles("layui");
