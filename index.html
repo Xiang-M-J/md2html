@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>H5 拖拽读取文件和文件夹</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <style>
+        #dropzone {
+            text-align: center;
+            width: 300px;
+            height: 100px;
+            margin: 10px;
+            padding: 10px;
+            border: 4px dashed red;
+            border-radius: 10px;
+        }
+        #boxtitle {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            color: black;
+            font: bold 2em "Arial", sans-serif;
+            width: 300px;
+            height: 100px;
+        }
+        body {
+            font: 14px "Arial", sans-serif;
+        }
+    </style>
+</head>
+<body>
+<p>
+    Drag files and/or directories to the box below!
+</p>
+<div id="dropzone">
+    <div id="boxtitle">
+        Drop Files Here
+    </div>
+</div>
+<h2>Directory tree:</h2>
+<ul id="listing">
+</ul>
+
+<script type="text/javascript">
+    let dropzone = document.getElementById("dropzone");
+    let listing  = document.getElementById("listing");
+
+    /**
+     * 读取文件
+     * @param  item         FileSystemDirectoryEntry 对象实例（目录实体）
+     * @param  container     显示容器
+     * @return void
+     */
+    function scanFiles(item, container) {
+        let elem = document.createElement("li");
+        elem.innerHTML = item.name;
+        container.appendChild(elem);
+
+        // 如果是目录，则递归读取
+        if (item.isDirectory) {
+            // 使用目录实体来创建 FileSystemDirectoryReader 实例
+            let directoryReader    = item.createReader();
+            let directoryContainer = document.createElement("ul");
+            container.appendChild(directoryContainer);
+
+            // 上面只是创建了 reader 实例，现在使用 reader 实例来读取 目录实体（读取目录内容）
+            directoryReader.readEntries(function(entries) {
+                // 循环目录内容
+                entries.forEach(function(entry) {
+                    // 处理内容（递归）
+                    scanFiles(entry, directoryContainer);
+                });
+            });
+        }
+    }
+
+    // 此事件是必须的，且要阻止默认事件
+    dropzone.addEventListener("dragover", function(event) {
+        event.preventDefault();
+    }, false);
+
+    // 拖拽结束时触发
+    dropzone.addEventListener("drop", function(event) {
+        // 拖拽（转移）的对象列表
+        let items = event.dataTransfer.items;
+        event.preventDefault();
+        listing.innerHTML = "";
+        console.log(items.length)
+        for (let i=0; i<items.length; i++) {
+            // file 对象（按实例拖拽的内容）转换成 FileSystemFileEntry 对象 或 FileSystemDirectoryEntry 对象
+            let item = items[i].webkitGetAsEntry();
+            console.log(item['fullPath'])
+            if (item) {
+                // 读取文件
+                scanFiles(item, listing);
+            }
+        }
+    }, false);
+</script>
+</body>
+</html>
