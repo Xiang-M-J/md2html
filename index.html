@@ -1,21 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<!Doctype html>
+<html lang="">
 <head>
     <meta charset="UTF-8">
-    <title>H5 拖拽读取文件和文件夹</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <title>Document</title>
     <style>
-        /*#dropzone {*/
-        /*    text-align: center;*/
-        /*    width: 300px;*/
-        /*    height: 100px;*/
-        /*    margin: 10px;*/
-        /*    padding: 10px;*/
-        /*    border: 4px dashed red;*/
-        /*    border-radius: 10px;*/
-        /*}*/
         #boxTitle {
             display: table-cell;
             vertical-align: middle;
@@ -25,54 +17,49 @@
             width: 300px;
             height: 100px;
         }
+        .listTitle{
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            color: black;
+            font: bold 1.2em "Arial", sans-serif;
+            width: 300px;
+            height: 100px;
+        }
         body {
             font: 14px "Arial", sans-serif;
+        }
+        ul{
+            list-style: url('/media/filefolder.svg');
+        }
+        li{
+            list-style: url('/media/file.svg');
         }
     </style>
 </head>
 <body>
-<p>
 
-</p>
-<div id="boxTitle">
-    Drop Files Here
-</div>
-<div id="dropzone" class="layui-bg-gray" style="padding: 30px;">
-    <div class="layui-row layui-col-space15">
-        <div class="layui-col-md3">
-            <div class="layui-panel layui-bg-cyan">
-                <div style="width: 20%; padding: 50px 50px;"></div>
-            </div>
+<div class="container-fluid">
+    <div class="row">
+        <div id="boxTitle">Drop Files Here</div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <div id="dropzone" style="position:relative; margin-left: 40px;background-color: blanchedalmond; width: 12%; height: 80px; padding: 60px;"></div>
+        </div>
+        <div class="col-4">
+            <div></div>
         </div>
     </div>
 </div>
-<br>
-<div class="layui-row">
-    <blockquote class="layui-elem-quote">Directory tree:</blockquote>
-    <div class="layui-bg-gray" id="fileTree"></div>
-    <div id="listing"></div>
-</div>
+<br/>
 
-<script src="./layui/layui.js"></script>
-
-<script type="module">
-    function data(title,children) {
-        this.title = title
-        this.children = children
-    }
+<div class="listTitle">The markdown files is list here</div>
+<div id="listing"></div>
+<script>
     let dropzone = document.getElementById("dropzone");
     let listing  = document.getElementById("listing");
 
-    layui.use('tree', function(){
-        const tree = layui.tree;
-        //渲染
-        const inst1 = tree.render({
-            elem: '#fileTree'  //绑定元素
-            ,showLine: false
-            ,spread: true
-            , data: data
-        });
-    });
     /**
      * 读取文件
      * @param  item         FileSystemDirectoryEntry 对象实例（目录实体）
@@ -80,19 +67,16 @@
      * @return void
      */
     function scanFiles(item, container) {
-
         let elem = document.createElement("li");
         if (item.isFile){
             let arr = item.name.split('.')
             if (arr[arr.length-1] === 'md' || arr[arr.length-1]==='markdown'){
                 elem.innerHTML = item.name;
                 container.appendChild(elem);
-                data.push({title: item.name, children:null })
             }
         }else {
             elem.innerHTML = item.name;
             container.appendChild(elem);
-            data.push({title: item.name, children:null })
         }
 
         // 如果是目录，则递归读取
@@ -101,7 +85,6 @@
             let directoryReader = item.createReader();
             let directoryContainer = document.createElement("ul");
             container.appendChild(directoryContainer);
-            data.push({title: item.name, children:null })
             // 上面只是创建了 reader 实例，现在使用 reader 实例来读取 目录实体（读取目录内容）
             directoryReader.readEntries(function(entries) {
                 // 循环目录内容
@@ -124,7 +107,6 @@
         let items = event.dataTransfer.items;
         event.preventDefault();
         listing.innerHTML = "";
-        // console.log(items.length)
         for (let i=0; i<items.length; i++) {
             // file 对象（按实例拖拽的内容）转换成 FileSystemFileEntry 对象 或 FileSystemDirectoryEntry 对象
             let item = items[i].webkitGetAsEntry();
@@ -134,16 +116,6 @@
             }
         }
     }, false);
-    function convertToData(data, listing) {
-        if (listing === null){
-            return
-        }
-        let child = listing.children
-        for(let i=0;i<child.childElementCount;i++){
-            data.push({title: child[i].name, children: null})
-            convertToData(data.children,child)
-        }
-    }
 </script>
 </body>
 </html>
